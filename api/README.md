@@ -1,64 +1,67 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Desenvolvimento do projeto
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Primeiramente, foi criado as tabelas do banco de dados com as seguintes relações:
 
-## About Laravel
+- N - 1 Users/Roles
+- 1 - N Users/Comments
+- 1 - N Comments/Revisions
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Também foi criado um seeder para um usuário admin inicial e um outro seeder para 2 funções: admin e customer.
+Após, foi feita a instação do JWT e é necessário o seguinte comando para o funcionamento da aplicação:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- php artisan jwt:secret
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Explicação dos endpoints
 
-## Learning Laravel
+- POST api/auth -> utilizado para autenticar um usuário com login e senha. É retornado um token jwt.
+- DELETE api/logout -> utilizado para deslogar um usuário.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- POST api/user/register -> utilizado para criação de novos usuários. Só é permitido criar um usuário admin quando na requisição possuir um usuário ADMIN logado.
+Quando não possuir um usuário admin logado apenas é possível criar usuário CUSTOMER.
+Essa rota não precisa de auntenticação para criação de usuário CUSTOMER.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- GET api/user/me -> retorna o usuário logado
+- PUT api/user/update/me -> atualiza dados do usuário logado
+- PUT api/user/update/:id -> atualiza dados do usuário passado na requisição. Apenas usuários ADMIN tem acesso à essa rota.
 
-## Laravel Sponsors
+- GET api/comments -> retorna todos comentários de forma paginada
+- POST api/comments -> utilizado para criação de um novo comentário. Necessário um usuário logado
+- PUT api/comments/:id -> atualiza um comentário. Necessário que o comentário tenha sido criado pelo usuário que está logado
+- DELETE api/comments/:id -> deleta o comentário passado na requisição. O ADMIN consegue excluir qualquer comentário. O CUSTOMER apenas consegue excluir comentários criados por ele.
+- DELETE /api/comments/delete/all -> apaga todos comentários. Apenas o ADMIN possui permissão.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Explicação dos requisitos
 
-### Premium Partners
+- O sistema deverá gerenciar os usuários, permitindo-os se cadastrar e editar seu cadastro:
+foi criado em endpoint POST api/user/register.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+- O sistema poderá autenticar o usuário através do e-mail e senha do usuário e, nas outras requisições, utilizar apenas um token de identificação:
+Foi utilizado autenticação JWT para utilização de token.
 
-## Contributing
+- O sistema deverá retornar comentários a todos que o acessarem, porém deverá permitir inserir comentários apenas a usuários autenticados:
+Foi criado o middleware JwtMiddleware para gerenciar permissões.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- O sistema deverá retornar qual é o autor do comentário e dia e horário da postagem:
+Foi criado relacionamentos para que seja capaz buscar o autor do comentário
+1 - N Users/Comments
 
-## Code of Conduct
+- O sistema deverá permitir o usuário editar os próprios comentários (exibindo a data de criação do comentário e data da última edição):
+Foi criado o endpoint PUT api/comments/:id 
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- O sistema deverá possuir histórico de edições do comentário:
+Foi criado uma tabela de revisions e um observer para Comments. Assim, sempre que um comentário for atualizado gerará um novo registro em revisions.
 
-## Security Vulnerabilities
+- O sistema deverá permitir o usuário excluir os próprios comentários;
+Foi criado o endpoint DELETE api/comments/:id
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- O sistema deverá possuir um usuário administrador que pode excluir todos os comentários:
+Foi criado uma tabela de roles onde possui o registro de ADMIN. Dessa maneira, qualquer usuário que possui role_id referente à ADMIN conseguirá excluir comentários.
+Para exclusão de todos comentários foi criado o endpoint DELETE /api/comments/delete/all
 
-## License
+- O sistema deverá criptografar a senha do usuário:
+Foi usada a facade do laravel use Illuminate\Support\Facades\Hash; para criptografia de senha.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Implementação de testes automatizados utilizando phpunit:
+Foram implementados testes para todos endpoints, estão localizados em: api/app/tests/Feature
+Também foi criado o arquivo .env.testing para configuração do banco de dados em memórios para realização dos testes.
+

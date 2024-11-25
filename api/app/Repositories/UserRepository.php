@@ -3,7 +3,9 @@
 namespace App\Repositories;
 
 use App\Interfaces\UserRepositoryInterface;
+use App\Models\Role;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -29,6 +31,14 @@ class UserRepository implements UserRepositoryInterface
 
     public function create(array $data): array
     {
+        if (JWTAuth::getToken()) {
+            $userLogged = JWTAuth::parseToken()->authenticate();
+        }
+
+        if(!isset($userLogged) || ($data['role_id'] == Role::ID_ADMIN && $userLogged->role->name != Role::ADMIN)){
+            throw new Exception('Unauthorized', 401);
+        }
+
         $user = User::create($data)->toArray();
 
         return $user;

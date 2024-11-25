@@ -20,12 +20,12 @@ use Illuminate\Support\Facades\Route;
 Route::post('auth', [AuthController::class, 'login']);
 Route::delete('logout', [AuthController::class, 'logout']);
 
-Route::prefix('/user')->group(function () {
-    Route::post('register', [UserController::class, 'store']);
-});
-
 Route::prefix('/comments')->group(function () {
     Route::get('/', [CommentController::class, 'index']);
+});
+
+Route::prefix('/user')->group(function () {
+    Route::post('register', [UserController::class, 'store']);
 });
 
 Route::middleware(['jwt'])->group(function () {
