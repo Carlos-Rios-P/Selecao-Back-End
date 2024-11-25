@@ -10,5 +10,5 @@ interface BaseInterface
     public function update(array $data, int $id): array;
     public function show(int $id): ?object;
     public function list(int $per_page = 15, string $order = 'ASC', string $search = ''): array;
-    public function delete(): array;
+    public function delete(int $id): void;
 }

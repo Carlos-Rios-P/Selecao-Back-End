@@ -20,10 +20,27 @@ class CommentService
         return $comment;
     }
 
+    public function update(array $data, int $id): array
+    {
+        $comment = $this->commentRepository->update($data, $id);
+
+        return $comment;
+    }
+
     public function index(): array
     {
         $comments = $this->commentRepository->list();
 
         return $comments;
+    }
+
+    public function delete(int $id): void
+    {
+        $this->commentRepository->delete($id);
+    }
+
+    public function deleteAll(): void
+    {
+        $this->commentRepository->deleteAll();
     }
 }

@@ -42,9 +42,8 @@ class UserRepository implements UserRepositoryInterface
         return $user->toArray();
     }
 
-    public function delete(): array
+    public function delete(int $id): void
     {
-        return [];
     }
 
     public function list(int $per_page = 15, string $order = 'ASC', string $search = ''): array

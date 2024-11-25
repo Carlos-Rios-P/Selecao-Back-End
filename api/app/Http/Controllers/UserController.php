@@ -28,7 +28,7 @@ class UserController extends Controller
                 'user' => $user
             ]);
         } catch (\Exception $exception) {
-            return $this->error($exception->getMessage());
+            return $this->error($exception->getMessage(), $exception->getCode());
         }
 
     }
@@ -45,7 +45,7 @@ class UserController extends Controller
                 'user' => $user
             ]);
         } catch (\Exception $exception) {
-            return $this->error($exception->getMessage());
+            return $this->error($exception->getMessage(), $exception->getCode());
         }
 
     }
@@ -66,7 +66,7 @@ class UserController extends Controller
                 return $this->error('Unauthorized.', 401);
             }
         } catch (\Exception $exception) {
-            return $this->error($exception->getMessage());
+            return $this->error($exception->getMessage(), $exception->getCode());
         }
     }
 

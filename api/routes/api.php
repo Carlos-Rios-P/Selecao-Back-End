@@ -31,11 +31,14 @@ Route::prefix('/comments')->group(function () {
 Route::middleware(['jwt'])->group(function () {
     Route::prefix('/user')->group(function () {
         Route::get('me', [UserController::class, 'me']);
-        Route::post('update/me', [UserController::class, 'updateMe']);
-        Route::post('update/{id}', [UserController::class, 'update']);
+        Route::put('update/me', [UserController::class, 'updateMe']);
+        Route::put('update/{id}', [UserController::class, 'update']);
     });
 
     Route::prefix('/comments')->group(function () {
         Route::post('/', [CommentController::class, 'store']);
+        Route::put('/update/{id}', [CommentController::class, 'update']);
+        Route::delete('/{id}', [CommentController::class, 'delete']);
+        Route::delete('/delete/all', [CommentController::class, 'deleteAll']);
     });
 });
