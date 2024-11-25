@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +20,22 @@ use Illuminate\Support\Facades\Route;
 Route::post('auth', [AuthController::class, 'login']);
 Route::delete('logout', [AuthController::class, 'logout']);
 
-Route::middleware(['jwt'])->group(function () {
+Route::prefix('/user')->group(function () {
+    Route::post('register', [UserController::class, 'store']);
+});
 
+Route::prefix('/comments')->group(function () {
+    Route::get('/', [CommentController::class, 'index']);
+});
+
+Route::middleware(['jwt'])->group(function () {
+    Route::prefix('/user')->group(function () {
+        Route::get('me', [UserController::class, 'me']);
+        Route::post('update/me', [UserController::class, 'updateMe']);
+        Route::post('update/{id}', [UserController::class, 'update']);
+    });
+
+    Route::prefix('/comments')->group(function () {
+        Route::post('/', [CommentController::class, 'store']);
+    });
 });

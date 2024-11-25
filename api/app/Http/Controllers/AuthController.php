@@ -2,43 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AuthService;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Validator;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    protected $authService;
+
+    public function __construct(AuthService $authService) {
+        $this->authService = $authService;
+    }
+
+    public function login(LoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email'     => 'required|email',
-            'password'  => 'required|string'
-        ]);
+        $credentials = $request->validated();
+        $token = $this->authService->login($credentials);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
+        if (!$token) {
+            return $this->error('Invalid credentials', 401);
         }
 
-        $credentials = $request->only(['email', 'password']);
-
-        if (!$token = Auth::attempt($credentials)) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
-
-        return response()->json([
+        return $this->json([
             'status'  => 'success',
             'message' => 'Login successful',
             'token_type' => 'bearer',
-            'token' => JWTAuth::fromUser(Auth::user(), [
-                'exp' => now()->addDay()->timestamp
-            ]),
+            'token' => $token,
             'user' => Auth::user()
         ]);
     }
@@ -47,11 +37,8 @@ class AuthController extends Controller
     {
         $token = JWTAuth::getToken();
 
-        JWTAuth::invalidate($token);
+        $this->authService->logout($token);
 
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Successfully logged out'
-        ]);
+        return $this->success('Successfully logged out');
     }
 }
