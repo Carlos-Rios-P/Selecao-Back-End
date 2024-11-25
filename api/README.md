@@ -32,36 +32,36 @@ Essa rota não precisa de auntenticação para criação de usuário CUSTOMER.
 
 ## Explicação dos requisitos
 
-- O sistema deverá gerenciar os usuários, permitindo-os se cadastrar e editar seu cadastro:
+- O sistema deverá gerenciar os usuários, permitindo-os se cadastrar e editar seu cadastro:<br>
 foi criado em endpoint POST api/user/register.
 
-- O sistema poderá autenticar o usuário através do e-mail e senha do usuário e, nas outras requisições, utilizar apenas um token de identificação:
+- O sistema poderá autenticar o usuário através do e-mail e senha do usuário e, nas outras requisições, utilizar apenas um token de identificação:<br>
 Foi utilizado autenticação JWT para utilização de token.
 
-- O sistema deverá retornar comentários a todos que o acessarem, porém deverá permitir inserir comentários apenas a usuários autenticados:
+- O sistema deverá retornar comentários a todos que o acessarem, porém deverá permitir inserir comentários apenas a usuários autenticados:<br>
 Foi criado o middleware JwtMiddleware para gerenciar permissões.
 
-- O sistema deverá retornar qual é o autor do comentário e dia e horário da postagem:
+- O sistema deverá retornar qual é o autor do comentário e dia e horário da postagem:<br>
 Foi criado relacionamentos para que seja capaz buscar o autor do comentário
 1 - N Users/Comments
 
-- O sistema deverá permitir o usuário editar os próprios comentários (exibindo a data de criação do comentário e data da última edição):
+- O sistema deverá permitir o usuário editar os próprios comentários (exibindo a data de criação do comentário e data da última edição):<br>
 Foi criado o endpoint PUT api/comments/:id 
 
-- O sistema deverá possuir histórico de edições do comentário:
+- O sistema deverá possuir histórico de edições do comentário:<br>
 Foi criado uma tabela de revisions e um observer para Comments. Assim, sempre que um comentário for atualizado gerará um novo registro em revisions.
 
-- O sistema deverá permitir o usuário excluir os próprios comentários;
+- O sistema deverá permitir o usuário excluir os próprios comentários;<br>
 Foi criado o endpoint DELETE api/comments/:id
 
-- O sistema deverá possuir um usuário administrador que pode excluir todos os comentários:
+- O sistema deverá possuir um usuário administrador que pode excluir todos os comentários:<br>
 Foi criado uma tabela de roles onde possui o registro de ADMIN. Dessa maneira, qualquer usuário que possui role_id referente à ADMIN conseguirá excluir comentários.
 Para exclusão de todos comentários foi criado o endpoint DELETE /api/comments/delete/all
 
-- O sistema deverá criptografar a senha do usuário:
+- O sistema deverá criptografar a senha do usuário:<br>
 Foi usada a facade do laravel use Illuminate\Support\Facades\Hash; para criptografia de senha.
 
-- Implementação de testes automatizados utilizando phpunit:
+- Implementação de testes automatizados utilizando phpunit:<br>
 Foram implementados testes para todos endpoints, estão localizados em: api/app/tests/Feature
 Também foi criado o arquivo .env.testing para configuração do banco de dados em memórios para realização dos testes.
 
